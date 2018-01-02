@@ -1,0 +1,99 @@
+#!/usr/bin/env node
+
+/*
+
+Copyright 2017 AJ Jordan <alex@strugee.net>.
+
+This file is part of the pump.io telemetry server.
+
+the pump.io telemetry server is free software: you can redistribute it
+and/or modify it under the terms of the GNU Affero General Public
+License as published by the Free Software Foundation, either version 3
+of the License, or (at your option) any later version.
+
+the pump.io telemetry server is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public
+License along with the pump.io telemetry server. If not, see
+<https://www.gnu.org/licenses/>.
+
+*/
+
+'use strict';
+
+var makeApp = require('../lib/app'),
+    bunyan = require('bunyan');
+
+var agpl_notice = ['Copyright (C) 2017 AJ Jordan <alex@strugee.net>.',
+		   'License AGPLv3+: GNU Affero GPL version 3 or later <https://gnu.org/licenses/agpl-3.0.html>.',
+		   'This is free software: you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law.'].join('\n');
+
+var argv = require('yargs')
+	    .usage('Usage: $0 [options]')
+	    .alias({'help': 'h', 'config': 'c', 'port': 'p', 'address': 'a'})
+	    .describe({
+		    port: 'Port that the HTTP server will bind to',
+		    address: 'Address that the HTTP server will bind to',
+		    driver: 'Databank driver',
+		    params: 'Databank driver parameters',
+		    logger: 'Whether to write logs',
+		    logfile: 'Full path to the file to stream logs (Bunyan-formatted JSON) to',
+		    logLevel: 'Bunyan loglevel (https://github.com/trentm/node-bunyan#levels)'
+	    })
+	    .default({
+		    config: '/etc/pumpio-telemetry.json',
+		    address: '0.0.0.0',
+		    port: 8000,
+		    driver: 'memory',
+		    params: {},
+		    logger: true,
+		    logLevel: 'info'
+	    })
+	    .boolean('logger')
+	    .number('port')
+	    .string(['address', 'driver', 'logfile', 'logLevel'])
+	    .config()
+	    .help()
+	    .version()
+	    .epilog(agpl_notice)
+	    .argv;
+
+console.log(agpl_notice);
+
+var logParams = {
+	name: 'pumpio-telemetry',
+	serializers: {
+		err: bunyan.stdSerializers.err,
+		req: bunyan.stdSerializers.req,
+		res: bunyan.stdSerializers.res
+	},
+	level: argv.logLevel
+};
+
+if (argv.logger === false) {
+	logParams.streams = [{path: "/dev/null"}];
+} else if (argv.logfile) {
+	logParams.streams = [{path: argv.logfile}];
+} else {
+	logParams.streams = [{stream: process.stdout}];
+}
+
+var log = bunyan.createLogger(logParams);
+
+makeApp(argv, log, function(err, app) {
+	if (err) {
+		log.error(err);
+		return;
+	}
+
+	var server = app.listen(argv.port, argv.address, function() {
+		var host = server.address().address;
+		var port = server.address().port;
+		log.info('Server listening at http://' + host + ':' + port + '/');
+	});
+
+	server.on('error', log.error.bind(log));
+});
