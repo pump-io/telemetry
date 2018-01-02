@@ -1,0 +1,30 @@
+{
+  "name": "telemetry",
+  "version": "1.0.0",
+  "description": "pump.io telemetry collection & statistics server",
+  "main": "index.js",
+  "dependencies": {
+    "bunyan": "^1.8.12",
+    "express": "^4.16.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pump-io/telemetry.git"
+  },
+  "keywords": [
+    "pumpio",
+    "federation",
+    "telemetry",
+    "daemon"
+  ],
+  "author": "AJ Jordan <alex@strugee.net>",
+  "license": "AGPL-3.0+",
+  "bugs": {
+    "url": "https://github.com/pump-io/telemetry/issues"
+  },
+  "homepage": "https://github.com/pump-io/telemetry#readme"
+}
