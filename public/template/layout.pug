@@ -1,9 +1,21 @@
 doctype html
 
-html
+html(lang='en')
 	head
+		meta(charset='utf-8')
+		meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+		link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css', integrity='sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy', crossorigin='anonymous')
 		title
 			block title-name
 			|  - pump.io telemetry
 	body
-		block content
+		.container
+			nav.navbar.navbar-expand-lg.bg-dark
+				.navbar-collapse
+					a.navbar-brand(href='/') Telemetry
+					ul.navbar-nav.mr-auto
+						li.nav-item
+							a.nav-link(href='/') Home
+						li.nav-item
+							a.nav-link(href='/about') About
+			block content
